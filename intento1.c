@@ -3,6 +3,7 @@
 #include <time.h>
 #define DTot 5
 #define turnos 11
+#define Valores 6
 #define bar printf("\n");
 
 void tirarDados();                                        // lanza los dados por primera vez
@@ -10,13 +11,17 @@ void mostrarTirada();                                     // muestra los resulta
 void ordenarMayorAmenor(int arr[DTot]);                   // ordena los dados para reconocerlos facilmente
 void repetirTirada(int arrOriginal[DTot], int cantDados); // repite las tiradas puedondo seleccionar cuales se desea cambiar
 void inicializarArrays(int arr[], int capacidad); 
+void contarFrecuencias(int dados[], int frecuencias[]); // cuenta la cantidad de veces que cayo un dado en el turno
+void subirPuntaje(int puntajes[], int dados[], int frecuencias[], int primerGenerala);
+
 
 /*  SE DEBEN REALIZAR VERIFICACIONES SOBRE LA CANTIDAD MAXIMA DE DADOS QUE SE PUEDEN SELECCIONAR EN EL REPETIR TIRADA; SE DEBE REALIZAR  LA  POSIBILIDAD DE JUGAR DE A 2, SE DEBE REALIZAR LA CANTIDAD TOTAL DE TURNOS (11), SE DEBE REALIZAR LA POSIBILIDAD DE CANCELAR CATEGORIAS Y DE ASIGNAR LOS PUNTAJES, SE DEBE DAR LA POSIBILIDAD DE ANOTAR SEGUN LOS ELEMENTOS DEL ARRAY LOS NUMEROS POSIBLES EN ACADA OPCION E IR ELIMINANDOA  LOS QUE YA SE LES HA ASIGNADO VALOR   */
 int main()
 {
 
-    int dados[DTot], a, repetir, acuTiradas = 1, cantjugadores;
+    int dados[DTot], frecuencias[Valores] , a, repetir,  cantjugadores;
     srand(time(NULL));
+    inicializarArrays(frecuencias, Valores);
 
     printf("Ingrese 1 si desea jugar solo o 2 si desea jugar de a 2");
     scanf("%d", &cantjugadores);
@@ -31,13 +36,17 @@ int main()
     if (cantjugadores)
     {
         int puntajeJ1[turnos], puntajeJ2[turnos];
+        int turnoJ1 = 1, turnoJ2 = 1;
+        int PrimerGeneralaJ1 =0, PrimerGeneralaJ2 = 0;
         inicializarArrays(puntajeJ1, turnos);
         inicializarArrays(puntajeJ2, turnos);
         for (int t = 0; t < turnos * 2; t++)
         {
+            int acuTiradas = 1;
             if (t % 2 == 0)
             {
-                printf("Turno Del Jugador 1");
+                
+                printf("Turno Del Jugador 1:  %d de %d", turnoJ1, turnos);
                 tirarDados(dados);
                 bar
                     mostrarTirada(dados);
@@ -61,19 +70,26 @@ int main()
                         repetirTirada(dados, cantATirar);
                     bar
                         mostrarTirada(dados);
+                    bar
                     acuTiradas++;
                     if (acuTiradas >= 3)
                     {
                         break;
                     }
 
-                    printf("presione 1 si desea volver a realizar una ultima tirada");
+                    printf("presione 1 si desea volver a realizar una ultima tirada, de lo contrario presione 0");
                     bar
+                    scanf("%d", &repetir);
                 }
+                turnoJ1++;
+                contarFrecuencias(dados, frecuencias);
+                subirPuntaje(puntajeJ1, dados, frecuencias, PrimerGeneralaJ1);
+
+                //aca va lo q sigue
             }
             else
             {
-                printf("Turno Del Jugador 2");
+                printf("Turno Del Jugador 2: %d de %d", turnoJ2, turnos);
                 tirarDados(dados);
                 bar
                     mostrarTirada(dados);
@@ -97,6 +113,7 @@ int main()
                         repetirTirada(dados, cantATirar);
                     bar
                         mostrarTirada(dados);
+                    bar
                     acuTiradas++;
                     if (acuTiradas >= 3)
                     {
@@ -105,12 +122,21 @@ int main()
 
                     printf("presione 1 si desea volver a realizar una ultima tirada");
                     bar
+                    scanf("%d", &repetir);
                 }
+                turnoJ2++;
+                contarFrecuencias(dados, frecuencias);
+                subirPuntaje(puntajeJ2, dados, frecuencias, PrimerGeneralaJ2);
+
+                //aca va lo q sigue
             }
         }
-    }
+    }else{
+        int PrimerGeneralaJ1 =0, puntajeJ1[turnos];
+        inicializarArrays(puntajeJ1, turnos);
     for (int t = 0; t < turnos; t++)
     {
+        int acuTiradas = 1; 
         printf("turno %d de %d" , t+1, turnos);
     tirarDados(dados);
     bar
@@ -135,6 +161,7 @@ int main()
             repetirTirada(dados, cantATirar);
         bar
             mostrarTirada(dados);
+        bar
         acuTiradas++;
         if (acuTiradas >= 3)
         {
@@ -143,7 +170,15 @@ int main()
 
         printf("presione 1 si desea volver a realizar una ultima tirada");
         bar
+        scanf("%d", &repetir);
     }
+    contarFrecuencias(dados, frecuencias);
+    subirPuntaje(puntajeJ1, dados, frecuencias, PrimerGeneralaJ1 );
+    }
+    
+
+    //sigue aca
+
     }
     
     
@@ -167,7 +202,7 @@ int main()
 
 
 /////////////////////////////////////////////////////////////////////////////////
-/// @param arr 
+/// 
 void tirarDados(int arr[DTot])
 {
     int a = 0;
@@ -231,9 +266,151 @@ void repetirTirada(int arrOriginal[DTot], int cantDados)
     }
 }
 
-void subirPuntaje(int puntajes[], int dados[])
-{
+void subirPuntaje(int puntajes[], int dados[], int frecuencias[], int primerGenerala)
+{   printf("Opciones de Puntuacion");
+    bar
+    
+    for (int i = 0; i < Valores; i++)
+    {
+        if (puntajes[i] == 0)
+        {
+            printf(" %d) Anotar %d al %d ",i+1, (frecuencias[i]*(i+1)) ,i+1 );
+            bar
+            
+            
+            
+        }
+    }
+
+    // escalera
+    int escalera = 1;
+    for (int i = 0; i < Valores-1; i++)
+    {
+        if (frecuencias[i]==0)
+        {
+            escalera = 0;
+            break;
+        }
+        
+    }
+    for (int i = 1; i < Valores; i++)
+    {
+        if (frecuencias[i]==0)
+        {
+            escalera = 0;
+            break;
+        }
+        
+    }
+
+    if (escalera)
+    {
+        printf("7) Anotarse Escalera");
+        bar
+    }else{
+        printf("7) Tacharse Escalera");
+        bar
+    }
+    
+    // full
+    int trio=0, par=0;
+    for (int i = 0; i < Valores; i++)
+    {
+        if (frecuencias[i] == 3)
+        {
+            trio = 1;
+        }
+        if (frecuencias[i] == 2)
+        {
+            par = 1;
+        }
+    }
+
+    if (trio && par)
+    {
+        printf("8) Anotarse Full ");
+        bar
+    }   
+    else{
+        printf("8) Tacharse Full ");
+        bar
+    }
+
+    int pocker = 0;
+    for (int i = 0; i < Valores; i++)
+    {
+        if (frecuencias[i]==4)
+        {
+            pocker = 1;
+        }
+        
+    }
+
+    if (pocker)
+    {
+        printf("9) Anotarse Pocker ");
+        bar
+    }   
+    else{
+        printf("9) Tacharse Pocker ");
+        bar
+    }
+
+    int generala = 0;
+    for (int i = 0; i < Valores; i++)
+    {
+        if (frecuencias[i]==5)
+        {
+            generala = 1;
+            primerGenerala = 1;
+        }
+        
+    }
+
+    if (generala && !primerGenerala)
+    {
+        printf("10) Anotarse Generala ");
+        bar
+    }   
+    else{
+        printf("10) Tacharse Generala ");
+        bar
+    }
+
+    if (primerGenerala == 1)
+    {
+        printf("11) Anotarse Generala doble");
+        bar
+    }else{
+        printf("11) Tacharse Generala Doble");
+        bar
+    }
+
+    int seleccionador;
+    scanf("%d", &seleccionador);
+    while (seleccionador>12 && seleccionador<0)
+    {
+        printf("Elija un numero en el rango de opciones dadas \n ->");
+        
+        scanf("%d", &seleccionador);
+    }
+    
+    
+    
+    
+    
+    
+    
+    
 }
+
+
+void contarFrecuencias(int dados[], int frecuencias[]) {
+    for (int i = 0; i < DTot; i++) {
+        frecuencias[dados[i] - 1]++;
+    }
+}
+
 
 void inicializarArrays(int arr[], int capacidad)
 {
