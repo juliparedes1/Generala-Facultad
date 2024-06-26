@@ -12,8 +12,11 @@ void ordenarMayorAmenor(int arr[DTot]);                   // ordena los dados pa
 void repetirTirada(int arrOriginal[DTot], int cantDados); // repite las tiradas puedondo seleccionar cuales se desea cambiar
 void inicializarArrays(int arr[], int capacidad);
 void contarFrecuencias(int dados[], int frecuencias[]); // cuenta la cantidad de veces que cayo un dado en el turno
-void subirPuntaje(int puntajes[], int dados[], int frecuencias[], int primerGenerala);
-void mostrarPuntaje(int puntaje[]);
+void subirPuntaje(int puntajes[], int dados[], int frecuencias[], int primerGenerala);// suma los puntajes a cada jugador en su respectivo array
+void mostrarPuntaje(int puntaje[]); // muestra los puntajes de cada jugador 
+void verificacionDeRepetir(int *rep);
+int SacarPuntosFinales(int arr[]);
+void funcionAuxArr(int arr[]);
 
 /*  SE DEBEN REALIZAR VERIFICACIONES SOBRE LA CANTIDAD MAXIMA DE DADOS QUE SE PUEDEN SELECCIONAR EN EL REPETIR TIRADA; SE DEBE REALIZAR  LA  POSIBILIDAD DE JUGAR DE A 2, SE DEBE REALIZAR LA CANTIDAD TOTAL DE TURNOS (11), SE DEBE REALIZAR LA POSIBILIDAD DE CANCELAR CATEGORIAS Y DE ASIGNAR LOS PUNTAJES, SE DEBE DAR LA POSIBILIDAD DE ANOTAR SEGUN LOS ELEMENTOS DEL ARRAY LOS NUMEROS POSIBLES EN ACADA OPCION E IR ELIMINANDOA  LOS QUE YA SE LES HA ASIGNADO VALOR   */
 int main()
@@ -35,7 +38,7 @@ int main()
 
     if (cantjugadores)
     {
-        int puntajeJ1[turnos], puntajeJ2[turnos];
+        int puntajeJ1[turnos], puntajeJ2[turnos], puntajefinalJ1, puntajefinalJ2;
         int turnoJ1 = 1, turnoJ2 = 1;
         int PrimerGeneralaJ1 = 0, PrimerGeneralaJ2 = 0;
         inicializarArrays(puntajeJ1, turnos);
@@ -56,6 +59,8 @@ int main()
                     printf("Si desea repetir su tirada Presione 1, de lo contrario presione 0");
                 bar
                     scanf("%d", &repetir);
+                    // verificacion de repetir tirada
+                    verificacionDeRepetir(&repetir);
                 bar while (repetir != 0 && acuTiradas < 3)
                 {
                     int cantATirar = 0;
@@ -82,10 +87,13 @@ int main()
                     printf("presione 1 si desea volver a realizar una ultima tirada, de lo contrario presione 0");
                     bar
                         scanf("%d", &repetir);
+                    // verificacion de repetir tirada
+                    verificacionDeRepetir(&repetir);
                 }
                 turnoJ1++;
                 contarFrecuencias(dados, frecuencias);
                 subirPuntaje(puntajeJ1, dados, frecuencias, PrimerGeneralaJ1);
+                mostrarPuntaje(puntajeJ1);
 
                 // aca va lo q sigue
             }
@@ -100,6 +108,8 @@ int main()
                 bar
                     scanf("%d", &repetir);
                 bar 
+                // verificacion de repetir tirada
+                    verificacionDeRepetir(&repetir);
                 while (repetir != 0 && acuTiradas < 3)
                 {
                     int cantATirar = 0;
@@ -126,10 +136,13 @@ int main()
                     printf("presione 1 si desea volver a realizar una ultima tirada");
                     bar
                         scanf("%d", &repetir);
+                    // verificacion de repetir tirada
+                    verificacionDeRepetir(&repetir);
                 }
                 turnoJ2++;
                 contarFrecuencias(dados, frecuencias);
                 subirPuntaje(puntajeJ2, dados, frecuencias, PrimerGeneralaJ2);
+                mostrarPuntaje(puntajeJ2);
 
                 // aca va lo q sigue
             }
@@ -138,7 +151,7 @@ int main()
     else
     {
         
-        int PrimerGeneralaJ1 = 0, puntajeJ1[turnos];
+        int PrimerGeneralaJ1 = 0, puntajeJ1[turnos], puntajefinalJ1;
         inicializarArrays(puntajeJ1, turnos);
         for (int t = 0; t < turnos; t++)
         {
@@ -153,6 +166,7 @@ int main()
                 printf("Si desea repetir su tirada Presione 1, de lo contrario presione 0");
             bar
                 scanf("%d", &repetir);
+                verificacionDeRepetir(&repetir);
             bar while (repetir != 0 && acuTiradas < 3)
             {
                 int cantATirar = 0;
@@ -180,6 +194,7 @@ int main()
                 bar
                     scanf("%d", &repetir);
                 bar
+                verificacionDeRepetir(&repetir);
             }
             contarFrecuencias(dados, frecuencias);
             subirPuntaje(puntajeJ1, dados, frecuencias, PrimerGeneralaJ1);
@@ -187,6 +202,11 @@ int main()
         }
 
         // sigue aca
+        puntajefinalJ1 = SacarPuntosFinales(puntajeJ1);
+        bar
+        printf("Su puntaje final ha sido %d ", puntajefinalJ1);
+        bar
+        printf("Presione cualquier tecla para cerrar el juego");
     }
 
     
@@ -418,12 +438,7 @@ void subirPuntaje(int puntajes[], int dados[], int frecuencias[], int primerGene
         }
     }
 
-    for (int i = 0; i < turnos; i++) /// ESTO HAY Q BORRARLO
-    {
-        bar
-        printf("valores del array aux en este momento %d) %d", i+1, arrAux[i]);
-        bar
-    }
+    funcionAuxArr(arrAux); // ESTO HAY Q BORRRLo
     int seleccionador = 0;
     scanf("%d", &seleccionador);
     while ((seleccionador > 12 && seleccionador < 0) || arrAux[seleccionador-1] == 0)
@@ -457,9 +472,41 @@ void mostrarPuntaje(int puntaje[]){
     for (int i = 0; i < turnos; i++)
     {
         printf("----------------");
-        printf("Los puntajes son %d) %d", i+1, puntaje[i]);
-        bar
+        if (puntaje[i] == -1)
+        {
+            printf("Los puntajes son %d) ---------", i+1);
+            bar
+
+        }else{
+            printf("Los puntajes son %d) %d", i+1, puntaje[i]);
+            bar
+        }
+        
     }
+    
+}
+
+void verificacionDeRepetir(int *rep){ 
+    while (*rep > 1 || *rep < 0)
+                    {
+                        printf("Si desea repetir su tirada Presione 1, de lo contrario presione 0");
+                        bar
+                        scanf("%d", rep);
+                    }
+                    // lo que quiero hacer es que despues de verificar cuanto vale rep, lo ponga en el valor la variable que se ingreso a la funcion
+}
+
+int SacarPuntosFinales(int arr[]){
+    int puntuacion = 0;
+    for (int i = 0; i < turnos; i++)
+    {
+        if (arr[i] != -1)
+        {
+            puntuacion+=arr[i];
+        }
+        
+    }
+    return puntuacion;
     
 }
 
@@ -468,3 +515,18 @@ void mostrarPuntaje(int puntaje[]){
 // recordar que falta ahcerlo lo mismo apra 2 jugadores
 // verificar que algo anda mal con la generala doble
 // mejorar el codigo q esto es horrible
+
+// 26/6 se agrego funcionalidad de verificacion de repetidos
+// se agrego funcionalidad de sumar puntos
+// eliminar funcion de array aux
+
+
+void funcionAuxArr(int arr[]){
+    for (int i = 0; i < turnos; i++) /// ESTO HAY Q BORRARLO
+    {
+        bar
+        printf("valores del array aux en este momento %d) %d", i+1, arr[i]);
+        bar
+    }
+}
+
