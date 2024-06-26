@@ -40,9 +40,20 @@ int main()
     {
         int puntajeJ1[turnos], puntajeJ2[turnos], puntajefinalJ1, puntajefinalJ2;
         int turnoJ1 = 1, turnoJ2 = 1;
+        char nombreJ1[21], nombreJ2[21];
         int PrimerGeneralaJ1 = 0, PrimerGeneralaJ2 = 0;
         inicializarArrays(puntajeJ1, turnos);
         inicializarArrays(puntajeJ2, turnos);
+        bar
+        printf("Ingrese el nombre del jugador 1, max 20 caracteres");
+        bar
+        scanf("%20s", nombreJ1);
+        bar
+        printf("Ingrese el nombre del jugador 2. max 20 caracteres");
+        bar
+        scanf("%20s", nombreJ2);
+
+        
         for (int t = 0; t < turnos * 2; t++)
         {
             int frecuencias[Valores];
@@ -51,7 +62,7 @@ int main()
             if (t % 2 == 0)
             {
 
-                printf("Turno Del Jugador 1:  %d de %d", turnoJ1, turnos);
+                printf("Turno Del Jugador %s:  %d de %d",nombreJ1 , turnoJ1, turnos);
                 tirarDados(dados);
                 bar
                     mostrarTirada(dados);
@@ -66,12 +77,12 @@ int main()
                     int cantATirar = 0;
                     printf("ingrese la cantidad de dados a tirar");
                     bar
-                        scanf("%d", &cantATirar);
-                    while (cantATirar > 6)
+                    scanf("%d", &cantATirar);
+                    while (cantATirar > 5 || cantATirar <1)
                     {
-                        "La cantidad maxima de dados a tirar es 5, por favor elija de 1 a 5 dados";
+                        printf("La cantidad maxima de dados a tirar es 5, por favor elija de 1 a 5 dados");
                         bar
-                            scanf("%d", &cantATirar);
+                        scanf("%d", &cantATirar);
                     }
                     bar
                         repetirTirada(dados, cantATirar);
@@ -99,7 +110,7 @@ int main()
             }
             else
             {
-                printf("Turno Del Jugador 2: %d de %d", turnoJ2, turnos);
+                printf("Turno Del Jugador %s: %d de %d", nombreJ2, turnoJ2, turnos);
                 tirarDados(dados);
                 bar
                     mostrarTirada(dados);
@@ -115,12 +126,12 @@ int main()
                     int cantATirar = 0;
                     printf("ingrese la cantidad de dados a tirar");
                     bar
-                        scanf("%d", &cantATirar);
-                    while (cantATirar > 6)
+                    scanf("%d", &cantATirar);
+                    while (cantATirar > 5 || cantATirar <1)
                     {
-                        "La cantidad maxima de dados a tirar es 5, por favor elija de 1 a 5 dados";
+                        printf("La cantidad maxima de dados a tirar es 5, por favor elija de 1 a 5 dados");
                         bar
-                            scanf("%d", &cantATirar);
+                        scanf("%d", &cantATirar);
                     }
                     bar
                         repetirTirada(dados, cantATirar);
@@ -146,13 +157,29 @@ int main()
 
                 // aca va lo q sigue
             }
+        }// aca continua luego de los turnos
+        puntajefinalJ1 = SacarPuntosFinales(puntajeJ1);
+        puntajefinalJ2 = SacarPuntosFinales(puntajeJ2);
+        if (puntajefinalJ1 >puntajefinalJ2)
+        {
+            printf("El jugador %s ha conseguido, %d puntos superando al jugador %s que ha conseguido %d puntos ", nombreJ1,  puntajefinalJ1, nombreJ2 , puntajefinalJ2);
+        }else{
+            printf("El jugador %s ha conseguido, %d puntos superando al jugador %s que ha conseguido %d puntos ", nombreJ2, puntajefinalJ1, nombreJ1, puntajefinalJ2);
+
         }
+        
+
     } // DE ACA PARA ABAJO ES UN JUGADOR
     else
     {
-        
+        char nombreJ1[21];
         int PrimerGeneralaJ1 = 0, puntajeJ1[turnos], puntajefinalJ1;
         inicializarArrays(puntajeJ1, turnos);
+        bar
+        printf("Ingrese el nombre del jugador 1, max 20 caracteres");
+        bar
+        scanf("%20s", nombreJ1);
+        bar
         for (int t = 0; t < turnos; t++)
         {
             int frecuencias[Valores];
@@ -163,7 +190,7 @@ int main()
             bar
                 mostrarTirada(dados);
             bar
-                printf("Si desea repetir su tirada Presione 1, de lo contrario presione 0");
+                printf("%s deseas repetir su tirada Presione 1, de lo contrario presione 0", nombreJ1);
             bar
                 scanf("%d", &repetir);
                 verificacionDeRepetir(&repetir);
@@ -172,12 +199,12 @@ int main()
                 int cantATirar = 0;
                 printf("ingrese la cantidad de dados a tirar");
                 bar
-                    scanf("%d", &cantATirar);
-                while (cantATirar > 6)
+                scanf("%d", &cantATirar);
+                while (cantATirar > 5 || cantATirar <1)
                 {
-                    "La cantidad maxima de dados a tirar es 5, por favor elija de 1 a 5 dados";
+                    printf("La cantidad maxima de dados a tirar es 5, por favor elija de 1 a 5 dados");
                     bar
-                        scanf("%d", &cantATirar);
+                    scanf("%d", &cantATirar);
                 }
                 bar
                     repetirTirada(dados, cantATirar);
@@ -185,12 +212,12 @@ int main()
                     mostrarTirada(dados);
                 bar
                     acuTiradas++;
-                if (acuTiradas >= 3)
+                if (acuTiradas >= 3) 
                 {
                     break;
                 }
 
-                printf("presione 1 si desea volver a realizar una ultima tirada");
+                printf("presione 1 si desea volver a realizar una ultima tirada de lo contrario presione 0");
                 bar
                     scanf("%d", &repetir);
                 bar
@@ -204,7 +231,7 @@ int main()
         // sigue aca
         puntajefinalJ1 = SacarPuntosFinales(puntajeJ1);
         bar
-        printf("Su puntaje final ha sido %d ", puntajefinalJ1);
+        printf("%s tu puntaje final ha sido %d ", nombreJ1, puntajefinalJ1);
         bar
         printf("Presione cualquier tecla para cerrar el juego");
     }
@@ -264,7 +291,14 @@ void repetirTirada(int arrOriginal[DTot], int cantDados)
         int num;
         printf("seleccione la posicion del elemento %d de %d que ha elegido ", i + 1, cantDados);
         bar
+        scanf("%d", &num);
+        while (num>5 || num<1)
+        {
+            printf("Las posiciones de los dados son del 1 al 5");
+            bar
             scanf("%d", &num);
+        }
+        
         arrSeleccionador[i] = num - 1;
     }
 
@@ -441,7 +475,7 @@ void subirPuntaje(int puntajes[], int dados[], int frecuencias[], int primerGene
     funcionAuxArr(arrAux); // ESTO HAY Q BORRRLo
     int seleccionador = 0;
     scanf("%d", &seleccionador);
-    while ((seleccionador > 12 && seleccionador < 0) || arrAux[seleccionador-1] == 0)
+    while ((seleccionador > 12 || seleccionador < 0) || arrAux[seleccionador-1] == 0)
     {
         printf("Elija un numero en el rango de opciones dadas \n ->");
         scanf("%d", &seleccionador);
