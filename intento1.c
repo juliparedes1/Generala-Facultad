@@ -14,11 +14,11 @@ void inicializarArrays(int arr[], int capacidad);
 void contarFrecuencias(int dados[], int frecuencias[]); // cuenta la cantidad de veces que cayo un dado en el turno
 void subirPuntaje(int puntajes[], int dados[], int frecuencias[], int primerGenerala);// suma los puntajes a cada jugador en su respectivo array
 void mostrarPuntaje(int puntaje[]); // muestra los puntajes de cada jugador 
-void verificacionDeRepetir(int *rep);
-int SacarPuntosFinales(int arr[]);
-void funcionAuxArr(int arr[]);
+void verificacionDeRepetir(int *rep); // verifica que los usuarios no hagan macanas
+int SacarPuntosFinales(int arr[]); // suma los valores del array 
+void funcionAuxArr(int arr[]); // esto es para probar q todo ande bien x detras luego hay q borrarlo
 
-/*  SE DEBEN REALIZAR VERIFICACIONES SOBRE LA CANTIDAD MAXIMA DE DADOS QUE SE PUEDEN SELECCIONAR EN EL REPETIR TIRADA; SE DEBE REALIZAR  LA  POSIBILIDAD DE JUGAR DE A 2, SE DEBE REALIZAR LA CANTIDAD TOTAL DE TURNOS (11), SE DEBE REALIZAR LA POSIBILIDAD DE CANCELAR CATEGORIAS Y DE ASIGNAR LOS PUNTAJES, SE DEBE DAR LA POSIBILIDAD DE ANOTAR SEGUN LOS ELEMENTOS DEL ARRAY LOS NUMEROS POSIBLES EN ACADA OPCION E IR ELIMINANDOA  LOS QUE YA SE LES HA ASIGNADO VALOR   */
+
 int main()
 {
 
@@ -544,19 +544,24 @@ int SacarPuntosFinales(int arr[]){
     
 }
 
+//25/6
+/*  SE DEBEN REALIZAR VERIFICACIONES SOBRE LA CANTIDAD MAXIMA DE DADOS QUE SE PUEDEN SELECCIONAR EN EL REPETIR TIRADA; SE DEBE REALIZAR  LA  POSIBILIDAD DE JUGAR DE A 2, SE DEBE REALIZAR LA CANTIDAD TOTAL DE TURNOS (11), SE DEBE REALIZAR LA POSIBILIDAD DE CANCELAR CATEGORIAS Y DE ASIGNAR LOS PUNTAJES, SE DEBE DAR LA POSIBILIDAD DE ANOTAR SEGUN LOS ELEMENTOS DEL ARRAY LOS NUMEROS POSIBLES EN ACADA OPCION E IR ELIMINANDOA  LOS QUE YA SE LES HA ASIGNADO VALOR   */
 
-
-// recordar que falta ahcerlo lo mismo apra 2 jugadores
-// verificar que algo anda mal con la generala doble
-// mejorar el codigo q esto es horrible
 
 // 26/6 se agrego funcionalidad de verificacion de repetidos
 // se agrego funcionalidad de sumar puntos
+// se completo el juego falta mejorar el codigo y verificar lo q pide para 2 programadores
+
+// verificar que algo anda mal con la generala doble (creo que ya lo arregle)
+// mejorar el codigo q esto es horrible
 // eliminar funcion de array aux
+// mejorar la interface grafica ahre q es la consola 
+
+
 
 
 void funcionAuxArr(int arr[]){
-    for (int i = 0; i < turnos; i++) /// ESTO HAY Q BORRARLO
+    for (int i = 0; i < turnos; i++) /// ESTO HAY Q BORRARLO primero del codigo luego la funcion
     {
         bar
         printf("valores del array aux en este momento %d) %d", i+1, arr[i]);
