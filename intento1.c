@@ -569,3 +569,5 @@ void funcionAuxArr(int arr[]){
     }
 }
 
+
+/// probando como funcionan las ramas 
