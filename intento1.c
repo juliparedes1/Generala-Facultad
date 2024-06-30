@@ -4,20 +4,18 @@
 #define N_DADOS 5
 #define TURNOS 11
 #define VALORES 6
-#define BAR printf("\n");
 
-void tirarDados(int arrOriginal[N_DADOS], int cantDados); // Lanzamiento de dados (para todos los casos, inicial y/o repetición)
+void tirarDados(int arrOriginal[N_DADOS], int cantDados); // Lanzamiento de dados (para todos los casos)
 void mostrarTirada(int arr[N_DADOS]);                     // Muestra los resultados de los dados
 void ordenarMayorAMenor(int arr[N_DADOS]);                // Ordena los dados para reconocerlos facilmente
 void inicializarArrays(int arr[], int capacidad);
 void contarFrecuencias(int dados[], int frecuencias[]);                                // cuenta la cantidad de veces que cayo un dado en el turno
 void subirPuntaje(int puntajes[], int dados[], int frecuencias[], int primerGenerala); // suma los puntajes a cada jugador en su respectivo array
 void mostrarPuntaje(int puntaje[]);                                                    // muestra los puntajes de cada jugador
-// void verificacionDeRepetir(int *rep);                                                  // verifica que los usuarios no hagan macanas
-int sacarPuntosFinales(int arr[]); // suma los valores del array
-void funcionAuxArr(int arr[]);     // esto es para probar q todo ande bien x detras luego hay q borrarlo
+int sacarPuntosFinales(int arr[]);                                                     // suma los valores del array
+void funcionAuxArr(int arr[]);                                                         // esto es para probar q todo ande bien x detras, luego hay q borrarlo
 void resetGame(int *t, double arrTiempo[], int cantJugadores, int arrPuntajeJ1[], int arrPuntajeJ2[], int *turnoJ1, int *turnoJ2);
-void finalizarTurno(int jugador, clock_t inicio, double tiempos[]);
+void timeLogger(int jugador, time_t inicio, double tiempos[]);
 
 int main()
 {
@@ -30,182 +28,134 @@ int main()
     scanf("%d", &cantjugadores);
   } while (cantjugadores >= 3 || cantjugadores <= 0);
 
-  // Modo 2 Jugadores
+  int puntajeJ1[TURNOS], puntajeJ2[TURNOS], puntajefinalJ1, puntajefinalJ2;
+  int turnoJ1 = 1, turnoJ2 = 1;
+  char nombreJ1[21], nombreJ2[21];
+  int PrimerGeneralaJ1 = 0, PrimerGeneralaJ2 = 0;
+
+  // Tiempos
+  double tiempos[cantjugadores];
+
+  inicializarArrays(puntajeJ1, TURNOS);
   if (cantjugadores == 2)
   {
-    int puntajeJ1[TURNOS], puntajeJ2[TURNOS], puntajefinalJ1, puntajefinalJ2;
-    int turnoJ1 = 1, turnoJ2 = 1;
-    char nombreJ1[21], nombreJ2[21];
-    int PrimerGeneralaJ1 = 0, PrimerGeneralaJ2 = 0;
-    // Tiempos
-    double tiempos[cantjugadores];
-
-    inicializarArrays(puntajeJ1, TURNOS);
-    // Parametrizar
     inicializarArrays(puntajeJ2, TURNOS);
+  }
 
-    printf("Ingrese el nombre del jugador 1, max 20 caracteres > ");
-    scanf("%20s", nombreJ1);
+  printf("Ingrese el nombre del jugador 1, max 20 caracteres > ");
+  scanf("%20s", nombreJ1);
 
-    // Parametrizar
+  if (cantjugadores == 2)
+  {
     printf("Ingrese el nombre del jugador 2, max 20 caracteres > ");
     scanf("%20s", nombreJ2);
+  }
 
-    int turnoActivo;
-    // Parametrizar (TURNOS * 2 || 1)
-    for (turnoActivo = 0; turnoActivo < TURNOS * 2; turnoActivo++)
+  int turnoActivo;
+  for (turnoActivo = 0; turnoActivo < (TURNOS * cantjugadores); turnoActivo++)
+  {
+    time_t inicio;
+    time(&inicio);
+    int reset = 1;
+
+    // Array para guardar las frecuencias de cada numero
+    int frecuencias[VALORES];
+    inicializarArrays(frecuencias, VALORES);
+    int acumTiradas = 1;
+
+    // Embellecer/Refactorizar
+    printf("Turno del Jugador %s:  %d de %d",
+           cantjugadores == 1     ? nombreJ1
+           : turnoActivo % 2 == 0 ? nombreJ1
+                                  : nombreJ2,
+           cantjugadores == 1     ? turnoActivo + 1
+           : turnoActivo % 2 == 0 ? turnoJ1
+                                  : turnoJ2,
+           TURNOS);
+    tirarDados(dados, N_DADOS);
+
+    // Modificación con dowhile para prescindir de verificacionDeRepetir();
+    do
     {
-      // Variables para reinicio de juego
-      clock_t inicio = clock();
-      int reset = 1;
+      printf("Si desea repetir su tirada (intento 2), presione 1, de lo contrario presione 0 > ");
+      scanf("%d", &repetir);
+    } while (repetir < 0 || repetir > 1);
 
-      // Array para guardar las frecuencias de cada numero
-      int frecuencias[VALORES];
-      inicializarArrays(frecuencias, VALORES);
-      int acumTiradas = 1;
+    while (repetir != 0 && acumTiradas < 3)
+    {
+      int cantATirar = 0;
 
-      // Parametrizar o refactorizar en una funcion los turnos
-      // Turno del Jugador 1
-      if (turnoActivo % 2 == 0)
+      printf("Ingrese la cantidad de dados a tirar nuevamente > ");
+      scanf("%d", &cantATirar);
+
+      while (cantATirar > 5 || cantATirar < 1)
       {
-        printf("Turno del Jugador %s:  %d de %d", nombreJ1, turnoJ1, TURNOS);
-        tirarDados(dados, N_DADOS);
+        printf("La cantidad maxima de dados a tirar es 5, por favor elija de 1 a 5 dados > ");
+        scanf("%d", &cantATirar);
+      }
+      tirarDados(dados, cantATirar);
+      acumTiradas++;
 
-        // Modificación con dowhile para prescindir de verificacionDeRepetir();
-        do
-        {
-          printf("Si desea repetir su tirada (intento 2), presione 1, de lo contrario presione 0 > ");
-          scanf("%d", &repetir);
-        } while (repetir < 0 || repetir > 1);
-
-        // verificacionDeRepetir(&repetir);
-        while (repetir != 0 && acumTiradas < 3)
-        {
-          int cantATirar = 0;
-
-          printf("Ingrese la cantidad de dados a tirar > ");
-          scanf("%d", &cantATirar);
-
-          while (cantATirar > 5 || cantATirar < 1)
-          {
-            printf("La cantidad maxima de dados a tirar es 5, por favor elija de 1 a 5 dados > ");
-            scanf("%d", &cantATirar);
-          }
-          tirarDados(dados, cantATirar);
-          acumTiradas++;
-
-          if (acumTiradas >= 3)
-          {
-            break;
-          }
-          else
-          {
-            printf("Si desea repetir su tirada (intento %d), presione 1, de lo contrario presione 0 > ", acumTiradas + 1);
-            scanf("%d", &repetir);
-          }
-          // printf("Presione 1 si desea volver a realizar una ultima tirada, de lo contrario presione 0 >");
-          // scanf("%d", &repetir);
-          // verificacionDeRepetir(&repetir);
-        }
-
-        // Parametrizar
-        turnoJ1++;
-        contarFrecuencias(dados, frecuencias);
-        // Parametrizar puntajeJ1 || puntajeJ2 y PrimerGeneralaJ1 || PrimerGeneralaJ2
-        subirPuntaje(puntajeJ1, dados, frecuencias, PrimerGeneralaJ1);
-        // Parametrizar puntajeJ1 || puntajeJ2
-        mostrarPuntaje(puntajeJ1);
-
-        // Refactor dowhile
-        do
-        {
-          printf("Si desea resetear el juego presione 0, de lo contrario presione 1 > ");
-          scanf("%d", &reset);
-        } while (reset != 1 && reset != 0);
-
-        if (reset == 0)
-        {
-          // Parametrizar, reset1Jugador || reset2Jugadores
-          // reset1Jugador(&t, puntajeJ1, tiempos, cantjugadores);
-          resetGame(&turnoActivo, tiempos, cantjugadores, puntajeJ1, puntajeJ2, &turnoJ1, &turnoJ2);
-        }
-        // Parametrizar cantJugadores || cantJugadores + 1
-        finalizarTurno(cantjugadores, inicio, tiempos);
+      if (acumTiradas >= 3)
+      {
+        break;
       }
       else
-      // Turno del Jugador 2
       {
-        printf("Turno Del Jugador %s: %d de %d", nombreJ2, turnoJ2, TURNOS);
-        tirarDados(dados, N_DADOS);
-
-        // Modificación con dowhile para prescindir de verificacionDeRepetir();
-        do
-        {
-          printf("Si desea repetir su tirada (intento 2), presione 1, de lo contrario presione 0 > ");
-          scanf("%d", &repetir);
-        } while (repetir < 0 || repetir > 1);
-
-        // verificacionDeRepetir(&repetir);
-        while (repetir != 0 && acumTiradas < 3)
-        {
-          int cantATirar = 0;
-
-          printf("Ingrese la cantidad de dados a tirar > ");
-          scanf("%d", &cantATirar);
-
-          while (cantATirar > 5 || cantATirar < 1)
-          {
-            printf("La cantidad maxima de dados a tirar es 5, por favor elija de 1 a 5 dados > ");
-            scanf("%d", &cantATirar);
-          }
-          tirarDados(dados, cantATirar);
-          acumTiradas++;
-
-          if (acumTiradas >= 3)
-          {
-            break;
-          }
-          else
-          {
-            printf("Si desea repetir su tirada (intento %d), presione 1, de lo contrario presione 0 > ", acumTiradas + 1);
-            scanf("%d", &repetir);
-          }
-          // printf("Presione 1 si desea volver a realizar una ultima tirada, de lo contrario presione 0 >");
-          // scanf("%d", &repetir);
-          // verificacionDeRepetir(&repetir);
-        }
-
-        turnoJ2++;
-        contarFrecuencias(dados, frecuencias);
-        subirPuntaje(puntajeJ2, dados, frecuencias, PrimerGeneralaJ2);
-        mostrarPuntaje(puntajeJ2);
-
-        // Refactor dowhile
-        do
-        {
-          printf("Si desea resetear el juego presione 0, de lo contrario presione 1 > ");
-          scanf("%d", &reset);
-        } while (reset != 1 && reset != 0);
-
-        if (reset == 0)
-        {
-          // Parametrizar? 
-          resetGame(&turnoActivo, tiempos, cantjugadores, puntajeJ1, puntajeJ2, &turnoJ1, &turnoJ2);
-        }
-        // Parametrizar cantJugadores || cantJugadores + 1
-        finalizarTurno(cantjugadores + 1, inicio, tiempos);
+        printf("Si desea repetir su tirada (intento %d), presione 1, de lo contrario presione 0 > ", acumTiradas + 1);
+        scanf("%d", &repetir);
       }
     }
 
-    puntajefinalJ1 = sacarPuntosFinales(puntajeJ1);
-    // Parametrizar si se juega de a 2 puntajefinalJ2
-    puntajefinalJ2 = sacarPuntosFinales(puntajeJ2);
+    contarFrecuencias(dados, frecuencias);
 
-    // if (cantjugadores == 2) {...}
-    // else {
-    //  printf("%s tu puntaje final ha sido %d\n", nombreJ1, puntajefinalJ1);
-    // printf("Presione cualquier tecla para cerrar el juego > ");
-    // }
+    // Checkear orden de condiciones, se puede optimizar
+    if (turnoActivo % 2 == 0)
+    {
+      turnoJ1++;
+      subirPuntaje(puntajeJ1, dados, frecuencias, PrimerGeneralaJ1);
+      mostrarPuntaje(puntajeJ1);
+    }
+    else
+    {
+      if (cantjugadores == 2)
+      {
+        turnoJ2++;
+        subirPuntaje(puntajeJ2, dados, frecuencias, PrimerGeneralaJ2);
+        mostrarPuntaje(puntajeJ2);
+      }
+      else
+      {
+        turnoJ1++;
+        subirPuntaje(puntajeJ1, dados, frecuencias, PrimerGeneralaJ1);
+        mostrarPuntaje(puntajeJ1);
+      }
+    }
+
+    do
+    {
+      printf("Si desea resetear el juego presione 0, de lo contrario presione 1 > ");
+      scanf("%d", &reset);
+    } while (reset != 1 && reset != 0);
+
+    if (reset == 0)
+    {
+      resetGame(&turnoActivo, tiempos, cantjugadores, puntajeJ1, puntajeJ2, &turnoJ1, &turnoJ2);
+    }
+
+    // Repensar en donde ejecutar la impresion del tiempo de juego (y renombrar)
+    timeLogger(0, inicio, tiempos);
+    if (cantjugadores == 2)
+    {
+      timeLogger(1, inicio, tiempos);
+    }
+  }
+
+  puntajefinalJ1 = sacarPuntosFinales(puntajeJ1);
+
+  if (cantjugadores == 2)
+  {
+    puntajefinalJ2 = sacarPuntosFinales(puntajeJ2);
     if (puntajefinalJ1 > puntajefinalJ2)
     {
       printf("El jugador %s ha conseguido, %d puntos superando al jugador %s que ha conseguido %d puntos ", nombreJ1, puntajefinalJ1, nombreJ2, puntajefinalJ2);
@@ -215,92 +165,8 @@ int main()
       printf("El jugador %s ha conseguido, %d puntos superando al jugador %s que ha conseguido %d puntos ", nombreJ2, puntajefinalJ1, nombreJ1, puntajefinalJ2);
     }
   }
-  // Modo 1 Jugador
   else
   {
-    char nombreJ1[21];
-    // Tiempo
-    double tiempo[1] = {0};
-    int PrimerGeneralaJ1 = 0, puntajeJ1[TURNOS], puntajefinalJ1;
-
-    inicializarArrays(puntajeJ1, TURNOS);
-
-    printf("Ingrese el nombre del jugador 1, max 20 caracteres > ");
-    scanf("%20s", nombreJ1);
-
-    int turnoActivo;
-    for (turnoActivo = 0; turnoActivo < TURNOS; turnoActivo++)
-    {
-      // Variables para reinicio de juego
-      clock_t inicio = clock();
-      int reset = 1;
-
-      // Array para guardar las frecuencias de cada numero
-      int frecuencias[VALORES];
-      inicializarArrays(frecuencias, VALORES);
-      int acumTiradas = 1;
-
-      printf("Turno %d de %d", turnoActivo + 1, TURNOS);
-      tirarDados(dados, N_DADOS);
-
-      // Modificación con dowhile para prescindir de verificacionDeRepetir();
-      do
-      {
-        printf("Si desea repetir su tirada (intento 2), presione 1, de lo contrario presione 0 > ");
-        scanf("%d", &repetir);
-      } while (repetir < 0 || repetir > 1);
-
-      // verificacionDeRepetir(&repetir);
-      while (repetir != 0 && acumTiradas < 3)
-      {
-        int cantATirar = 0;
-
-        printf("Ingrese la cantidad de dados a tirar > ");
-        scanf("%d", &cantATirar);
-
-        while (cantATirar > 5 || cantATirar < 1)
-        {
-          printf("La cantidad maxima de dados a tirar es 5, por favor elija de 1 a 5 dados > ");
-          scanf("%d", &cantATirar);
-        }
-        tirarDados(dados, cantATirar);
-        acumTiradas++;
-
-        if (acumTiradas >= 3)
-        {
-          break;
-        }
-        else
-        {
-          printf("Si desea repetir su tirada (intento %d), presione 1, de lo contrario presione 0 > ", acumTiradas + 1);
-          scanf("%d", &repetir);
-        }
-        // printf("presione 1 si desea volver a realizar una ultima tirada de lo contrario presione 0 >");
-        // scanf("%d", &repetir);
-        // verificacionDeRepetir(&repetir);
-      }
-
-      contarFrecuencias(dados, frecuencias);
-      subirPuntaje(puntajeJ1, dados, frecuencias, PrimerGeneralaJ1);
-      mostrarPuntaje(puntajeJ1);
-
-      // Refactor dowhile
-      do
-      {
-        printf("Si desea resetear el juego presione 0, de lo contrario presione 1 > ");
-        scanf("%d", &reset);
-      } while (reset != 1 && reset != 0);
-
-      if (reset == 0)
-      {
-        // reset1Jugador(&t, puntajeJ1, tiempo, cantjugadores);
-        resetGame(&turnoActivo, tiempo, cantjugadores, puntajeJ1, 0, 0, 0);
-      }
-      finalizarTurno(cantjugadores, inicio, tiempo);
-    }
-
-    puntajefinalJ1 = sacarPuntosFinales(puntajeJ1);
-
     printf("%s tu puntaje final ha sido %d\n", nombreJ1, puntajefinalJ1);
     printf("Presione cualquier tecla para cerrar el juego > ");
   }
@@ -309,7 +175,7 @@ int main()
   return 0;
 }
 
-/////////////////////////////////////////////////////////////////////////////////
+// Funciones
 
 void tirarDados(int arr[N_DADOS], int cantDados)
 {
@@ -385,7 +251,8 @@ void mostrarTirada(int arr[N_DADOS])
   printf("\n");
 }
 
-void subirPuntaje(int puntajes[], int dados[], int frecuencias[], int primerGenerala)
+void subirPuntaje(int puntajes[], int dados[], int frecuencias[],
+                  int primerGenerala)
 {
   int arrAux[TURNOS];
   inicializarArrays(arrAux, TURNOS);
@@ -575,16 +442,6 @@ void mostrarPuntaje(int puntaje[])
   printf("\n----------------\n");
 }
 
-// void verificacionDeRepetir(int *rep)
-// {
-//   while (*rep > 1 || *rep < 0)
-//   {
-//     printf("Si desea repetir su tirada, presione 1, de lo contrario presione 0 > ");
-//     scanf("%d", rep);
-//   }
-//   // lo que quiero hacer es que despues de verificar cuanto vale rep, lo ponga en el valor la variable que se ingreso a la funcion
-// }
-
 int sacarPuntosFinales(int arr[])
 {
   int puntuacion = 0;
@@ -614,31 +471,25 @@ void resetGame(int *t, double arrTiempo[], int cantJugadores, int arrPuntajeJ1[]
   }
 }
 
-void finalizarTurno(int jugador, clock_t inicio, double tiempos[/*aca va la cant jugadores */])
+void timeLogger(int jugador, time_t inicio, double tiempos[])
 {
-  clock_t fin = clock();                                               // Obtiene el tiempo actual al finalizar el turno
-  double tiempoTranscurrido = (double)(fin - inicio) / CLOCKS_PER_SEC; // Calcula el tiempo transcurrido en segundos
-  tiempos[jugador] += tiempoTranscurrido;                              // Agrega el tiempo transcurrido al total del jugador
+  time_t fin;
+  time(&fin);
+  double tiempoTranscurrido = (double)(fin - inicio);
+  tiempos[jugador] += tiempoTranscurrido; // Agrega el tiempo transcurrido al total del jugador
+
+  // Repensar como imprimir el tiempo transcurrido para cada jugador
+  printf("El tiempo transcurrido en el turno ha sido de %lf segundos\n", tiempoTranscurrido);
+  printf("El tiempo transcurrido en total para el jugador %d es %lf segundos\n", jugador + 1, tiempos[jugador]);
 }
 
-// 25/6
-/*  SE DEBEN REALIZAR VERIFICACIONES SOBRE LA CANTIDAD MAXIMA DE DADOS QUE SE PUEDEN SELECCIONAR EN EL REPETIR TIRADA; SE DEBE REALIZAR  LA  POSIBILIDAD DE JUGAR DE A 2, SE DEBE REALIZAR LA CANTIDAD TOTAL DE TURNOS (11), SE DEBE REALIZAR LA POSIBILIDAD DE CANCELAR CATEGORIAS Y DE ASIGNAR LOS PUNTAJES, SE DEBE DAR LA POSIBILIDAD DE ANOTAR SEGUN LOS ELEMENTOS DEL ARRAY LOS NUMEROS POSIBLES EN ACADA OPCION E IR ELIMINANDOA  LOS QUE YA SE LES HA ASIGNADO VALOR   */
-
-// 26/6 se agrego funcionalidad de verificacion de repetidos
-// se agrego funcionalidad de sumar puntos
-// se completo el juego falta mejorar el codigo y verificar lo q pide para 2 programadores
-
 // verificar que algo anda mal con la generala doble (creo que ya lo arregle)
-// mejorar el codigo q esto es horrible
 // eliminar funcion de array aux
-// mejorar la interface grafica ahre q es la consola
 
 void funcionAuxArr(int arr[])
 {
   for (int i = 0; i < TURNOS; i++) /// ESTO HAY Q BORRARLO primero del codigo luego la funcion
   {
-    BAR
-        printf("valores del array aux en este momento %d) %d", i + 1, arr[i]);
-    BAR
+    printf("\nValores del array aux en este momento %d) %d\n", i + 1, arr[i]);
   }
 }
