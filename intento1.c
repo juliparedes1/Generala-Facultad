@@ -6,22 +6,24 @@
 #define VALORES 6
 #define MAX_PUNTOS 485
 
-void tirarDados(int arrOriginal[N_DADOS], int cantDados);                                                                        // Lanzamiento de dados (para todos los casos)
-void mostrarTirada(int arr[N_DADOS]);                                                                                            // Muestra los resultados de los dados, se ejecuta internamente en tirarDados();
-void ordenarMayorAMenor(int arr[N_DADOS]);                                                                                       // Ordena los dados para reconocerlos facilmente. También se ejecuta internamente en tirarDados();
-void inicializarArrays(int arr[], int capacidad);                                                                                // Reinicia los arrays de puntajes a 0 en el caso de reiniciar la partida o iniciarla por primera vez
-void contarFrecuencias(int dados[], int frecuencias[]);                                                                          // Cuenta la cantidad de veces que cayo un dado en el turno
-void subirPuntaje(int puntajes[], int dados[], int frecuencias[], int primerGenerala);                                           // suma los puntajes a cada jugador en su respectivo array
-void mostrarPuntaje(int puntaje[]);                                                                                              // muestra los puntajes de cada jugador
-int sacarPuntosFinales(int arr[]);                                                                                               // suma los valores del array f:w
-char *mostrarDesempeño(int puntaje);                                                                                             // Determina el desempeño según el puntaje final. Devuelve un puntero de char*, ya que almacena un string
-void funcionAuxArr(int arr[]);                                                                                                   // esto es para probar q todo ande bien x detras, luego hay q borrarlo
-void resetGame(int *t, long arrTiempo[], int cantJugadores, int arrPuntajeJ1[], int arrPuntajeJ2[], int *turnoJ1, int *turnoJ2); // Resetea la partida si el jugador lo elige
-void timeLogger(int nroTurno, int jugador, time_t inicio, long tiempos[]);                                                       // Muestra el tiempo de juego del turno activo, y el acumulado total
+void tirarDados(int arrOriginal[N_DADOS], int cantDados);                                                                       // Lanzamiento de dados (para todos los casos)
+void mostrarTirada(int arr[N_DADOS]);                                                                                           // Muestra los resultados de los dados, se ejecuta internamente en tirarDados();
+void ordenarMayorAMenor(int arr[N_DADOS]);                                                                                      // Ordena los dados para reconocerlos facilmente. También se ejecuta internamente en tirarDados();
+void inicializarArrays(int arr[], int capacidad);                                                                               // Reinicia los arrays de puntajes a 0 en el caso de reiniciar la partida o iniciarla por primera vez
+void contarFrecuencias(int dados[], int frecuencias[]);                                                                         // Cuenta la cantidad de veces que cayo un dado en el turno, sirve para detectar puntuaciones
+void subirPuntaje(int puntajes[], int dados[], int frecuencias[], int primerGenerala);                                          // Suma los puntajes a cada jugador en su respectivo array
+void mostrarPuntaje(int puntaje[]);                                                                                             // Muestra los puntajes de cada jugador
+int sacarPuntosFinales(int arr[]);                                                                                              // Suma los valores del array f:w
+char *mostrarDesempeño(int puntaje);                                                                                            // Determina el desempeño según el puntaje final. Devuelve un puntero de char*, ya que almacena un string. En cada caso de retorno, se asigna el tamano en memoria.
+void mostrarAuxArr(int arr[]);                                                                                                  // Muestra como funciona el array auxiliar para asignar puntajes. Para DEMO
+void resetGame(int *t, int arrTiempo[], int cantJugadores, int arrPuntajeJ1[], int arrPuntajeJ2[], int *turnoJ1, int *turnoJ2); // Resetea la partida si el jugador lo elige
+void timeLogger(int jugador, time_t inicio, int tiempos[]);                                                                     // Muestra el tiempo de juego del turno activo, y el acumulado total
 
 int main()
 {
+  // Se intancian las variables de los datos, repetidor, reseteo final y cantidad de jugadores
   int dados[N_DADOS], a, repetir, cantjugadores = 1;
+  // Se crea la semilla para los dados y su aleatoriedad
   srand(time(NULL));
 
   do
@@ -30,15 +32,17 @@ int main()
     scanf("%d", &cantjugadores);
   } while (cantjugadores >= 3 || cantjugadores <= 0);
 
+  // Se instancian las variables para los puntajes y turnos de los jugadores
   int puntajeJ1[TURNOS], puntajeJ2[TURNOS], puntajefinalJ1, puntajefinalJ2;
   int turnoJ1 = 1, turnoJ2 = 1;
   char nombreJ1[21], nombreJ2[21];
   int PrimerGeneralaJ1 = 0, PrimerGeneralaJ2 = 0;
 
-  // Tiempos
-  long tiempos[cantjugadores];
+  // Total de tiempo transcurrido en segundos para cada jugador
+  int tiempos[cantjugadores];
 
   inicializarArrays(puntajeJ1, TURNOS);
+
   if (cantjugadores == 2)
   {
     inicializarArrays(puntajeJ2, TURNOS);
@@ -58,13 +62,13 @@ int main()
   {
     int reset = 1;
 
-    // Array para guardar las frecuencias de cada numero. Es necesario?
+    // Array para guardar las frecuencias de cada numero. Es necesario para la inicializacion
     int frecuencias[VALORES];
 
     inicializarArrays(frecuencias, VALORES);
     int acumTiradas = 1;
 
-    // Embellecer/Refactorizar
+    // Operadores ternarios que resumen una estructura de control para imprimir nombre y turno activo
     printf("Turno del Jugador %s:  %d de %d",
            cantjugadores == 1     ? nombreJ1
            : turnoActivo % 2 == 0 ? nombreJ1
@@ -73,13 +77,12 @@ int main()
            : turnoActivo % 2 == 0 ? turnoJ1
                                   : turnoJ2,
            TURNOS);
+
     tirarDados(dados, N_DADOS);
 
-    // Se instancia time_t inicio con tipo long, y se ejecuta time(&inicio) para que se guarde el tiempo de inicio luego de tirar los dados
+    // Se instancia time_t inicio con tipo long, y se guarda el tiempo de inicio luego de tirar los dados
     time_t inicio = time(NULL);
-    // time(&inicio);
 
-    // Modificación con dowhile para prescindir de verificacionDeRepetir();
     do
     {
       printf("Si desea repetir su tirada (intento 2), presione 1, de lo contrario presione 0 > ");
@@ -114,33 +117,29 @@ int main()
 
     contarFrecuencias(dados, frecuencias);
 
-    // Checkear orden de condiciones, se puede optimizar
-    if (turnoActivo % 2 == 0)
+    if (cantjugadores == 2)
     {
-      turnoJ1++;
-      subirPuntaje(puntajeJ1, dados, frecuencias, PrimerGeneralaJ1);
-      mostrarPuntaje(puntajeJ1);
-    }
-    else
-    {
-      if (cantjugadores == 2)
-      {
-        turnoJ2++;
-        subirPuntaje(puntajeJ2, dados, frecuencias, PrimerGeneralaJ2);
-        mostrarPuntaje(puntajeJ2);
-      }
-      else
+      if (turnoActivo % 2 == 0)
       {
         turnoJ1++;
         subirPuntaje(puntajeJ1, dados, frecuencias, PrimerGeneralaJ1);
         mostrarPuntaje(puntajeJ1);
+        timeLogger(0, inicio, tiempos);
+      }
+      else
+      {
+        turnoJ2++;
+        subirPuntaje(puntajeJ2, dados, frecuencias, PrimerGeneralaJ2);
+        mostrarPuntaje(puntajeJ2);
+        timeLogger(1, inicio, tiempos);
       }
     }
-
-    timeLogger(turnoActivo, 0, inicio, tiempos);
-    if (cantjugadores == 2)
+    else
     {
-      timeLogger(turnoActivo, 1, inicio, tiempos);
+      turnoJ1++;
+      subirPuntaje(puntajeJ1, dados, frecuencias, PrimerGeneralaJ1);
+      mostrarPuntaje(puntajeJ1);
+      timeLogger(0, inicio, tiempos);
     }
 
     do
@@ -152,6 +151,22 @@ int main()
     if (reset == 0)
     {
       resetGame(&turnoActivo, tiempos, cantjugadores, puntajeJ1, puntajeJ2, &turnoJ1, &turnoJ2);
+    }
+
+    if (cantjugadores == 2)
+    {
+      if (turnoActivo % 2 == 0)
+      {
+        printf("El tiempo transcurrido en total para el J%d es %d segundos\n", 1, tiempos[0]);
+      }
+      else
+      {
+        printf("El tiempo transcurrido en total para el J%d es %d segundos\n", 2, tiempos[1]);
+      }
+    }
+    else
+    {
+      printf("El tiempo transcurrido en total para el J%d es %d segundos\n", 1, tiempos[0]);
     }
   }
 
@@ -179,9 +194,8 @@ int main()
   {
     printf("%s tu puntaje final ha sido %d\n", nombreJ1, puntajefinalJ1);
     printf("Desempeño: %s\n", mostrarDesempeño(puntajefinalJ1));
-    printf("Presione cualquier tecla para cerrar el juego > ");
   }
-
+  printf("Presione cualquier tecla para cerrar el juego > ");
   scanf("%d", &a);
   return 0;
 }
@@ -264,6 +278,8 @@ void mostrarTirada(int arr[N_DADOS])
 
 void subirPuntaje(int puntajes[], int dados[], int frecuencias[], int primerGenerala)
 {
+  // Este array se utiliza para llevar la cuenta de que puntajes se anotaron y cuales no (independiente del valor)
+  // Se checkea referenciando mediante indices comparados
   int arrAux[TURNOS];
   inicializarArrays(arrAux, TURNOS);
   printf("Opciones de Puntuacion:\n");
@@ -281,14 +297,13 @@ void subirPuntaje(int puntajes[], int dados[], int frecuencias[], int primerGene
     }
   }
 
-  // escalera
-
+  // Escalera
   if (puntajes[6] == 0)
   {
     int escalera = 1;
     for (int i = 0; i < VALORES - 1; i++)
     {
-      if (frecuencias[i] == 0)
+      if (frecuencias[i] == 1)
       {
         escalera = 0;
         break;
@@ -296,7 +311,7 @@ void subirPuntaje(int puntajes[], int dados[], int frecuencias[], int primerGene
     }
     for (int i = 1; i < VALORES; i++)
     {
-      if (frecuencias[i] == 0)
+      if (frecuencias[i] == 1)
       {
         escalera = 0;
         break;
@@ -314,8 +329,7 @@ void subirPuntaje(int puntajes[], int dados[], int frecuencias[], int primerGene
     }
   }
 
-  // full
-
+  // Full
   if (puntajes[7] == 0)
   {
 
@@ -344,7 +358,7 @@ void subirPuntaje(int puntajes[], int dados[], int frecuencias[], int primerGene
     }
   }
 
-  // poker
+  // Poker
   if (puntajes[8] == 0)
   {
     int poker = 0;
@@ -368,6 +382,7 @@ void subirPuntaje(int puntajes[], int dados[], int frecuencias[], int primerGene
     }
   }
 
+  // Generala
   if (puntajes[9] == 0)
   {
     int generala = 0;
@@ -392,6 +407,7 @@ void subirPuntaje(int puntajes[], int dados[], int frecuencias[], int primerGene
     }
   }
 
+  // Generala doble
   if (puntajes[10] == 0)
   {
     if (primerGenerala == 1)
@@ -406,10 +422,14 @@ void subirPuntaje(int puntajes[], int dados[], int frecuencias[], int primerGene
     }
   }
 
-  // funcionAuxArr(arrAux); // Evaluar su uso
+  // Opcional: Ejecutar para mostrar el array auxiliar que se utiliza para calcular
+  // mostrar(arrAux);
+
   int seleccionador = 0;
   printf("\nElija una opción > ");
   scanf("%d", &seleccionador);
+
+  // El valor en arrAux[seleccionador - 1] sera 0 si ya el puntaje fue anotado
   while ((seleccionador > 12 || seleccionador < 0) || arrAux[seleccionador - 1] == 0)
   {
     printf("Elija un numero en el rango de opciones dadas > ");
@@ -490,8 +510,9 @@ char *mostrarDesempeño(int puntaje)
   }
 }
 
-void resetGame(int *t, long arrTiempo[], int cantJugadores, int arrPuntajeJ1[], int arrPuntajeJ2[], int *turnoJ1, int *turnoJ2)
+void resetGame(int *t, int arrTiempo[], int cantJugadores, int arrPuntajeJ1[], int arrPuntajeJ2[], int *turnoJ1, int *turnoJ2)
 {
+  // Se configura en -1 porque el bucle ejecuta el aumento de la variable turnoActivo, para que quede en 0
   *t = -1;
   inicializarArrays(arrPuntajeJ1, TURNOS);
   if (cantJugadores == 2)
@@ -506,27 +527,21 @@ void resetGame(int *t, long arrTiempo[], int cantJugadores, int arrPuntajeJ1[], 
   }
 }
 
-void timeLogger(int nroTurno, int jugador, time_t inicio, long tiempos[])
+void timeLogger(int jugador, time_t inicio, int tiempos[])
 {
+  // Instanciamos el instante de ejecucion final
   time_t fin = time(NULL);
-
-  // difftime es una funcion de time_h que calcula la diferencia de tiempo entre el primer y el segundo parámetro
-  long tiempoTranscurrido = difftime(fin, inicio);
-  tiempos[jugador] += tiempoTranscurrido; // Agrega el tiempo transcurrido al total del jugador
-
-  printf("El tiempo transcurrido en el turno ha sido de %ld segundos\n", tiempoTranscurrido);
-  if (nroTurno != 0)
-  {
-    printf("El tiempo transcurrido en total para el J%d es %ld segundos\n", jugador + 1, tiempos[jugador]);
-  }
+  // Utilizando difftime calculamos la diferencia de tiempo entre el final y el inicio
+  int tiempoTranscurridoSegundos = difftime(fin, inicio);
+  // Sumamos al tiempo total de cada jugador
+  tiempos[jugador] += tiempoTranscurridoSegundos;
 }
 
-// verificar que algo anda mal con la generala doble (creo que ya lo arregle)
-// eliminar funcion de array aux
+// Funcion opcional para mostrar el array auxiliar utilizado para puntuar (calculo paso a paso)
 
-void funcionAuxArr(int arr[])
+void mostrarAuxArr(int arr[])
 {
-  for (int i = 0; i < TURNOS; i++) /// ESTO HAY Q BORRARLO primero del codigo luego la funcion
+  for (int i = 0; i < TURNOS; i++)
   {
     printf("\nValores del array aux en este momento %d) %d\n", i + 1, arr[i]);
   }
