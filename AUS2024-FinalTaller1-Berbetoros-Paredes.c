@@ -298,35 +298,51 @@ void subirPuntaje(int puntajes[], int dados[], int frecuencias[], int primerGene
   }
 
   // Escalera
+
+
   if (puntajes[6] == 0)
   {
-    int escalera = 1;
+    int escalera = 0;
+    int acuEscalera = 0;
     for (int i = 0; i < VALORES - 1; i++)
     {
       if (frecuencias[i] == 1)
       {
-        escalera = 0;
-        break;
+        acuEscalera++;
       }
+      
     }
-    for (int i = 1; i < VALORES; i++)
-    {
-      if (frecuencias[i] == 1)
+    if (acuEscalera == 5)
       {
-        escalera = 0;
-        break;
+        escalera = 1;
+      }else{
+        acuEscalera = 0;
+        for (int i = 1; i < VALORES; i++)
+        {
+          if (frecuencias[i]==1)
+          {
+            acuEscalera++;
+          }
+          
+        }
+        
       }
-    }
-    if (escalera)
-    {
-      printf("7) Anotarse Escalera\n");
-      arrAux[6] = 35;
-    }
-    else
-    {
-      printf("7) Tacharse Escalera\n");
-      arrAux[6] = -1;
-    }
+      if (acuEscalera == 5)
+      {
+        escalera = 1;
+      }
+      
+
+      if (escalera)
+      {
+        printf("7) Anotarse Escalera\n");
+        arrAux[6] = 35;
+      }
+      else
+      {
+        printf("7) Tacharse Escalera\n");
+        arrAux[6] = -1;
+      }
   }
 
   // Full
