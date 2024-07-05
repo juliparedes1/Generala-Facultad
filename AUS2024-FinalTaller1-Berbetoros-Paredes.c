@@ -426,7 +426,17 @@ void subirPuntaje(int puntajes[], int dados[], int frecuencias[], int primerGene
   // Generala doble
   if (puntajes[10] == 0)
   {
-    if (primerGenerala == 1)
+
+    int generala = 0;
+    for (int i = 0; i < VALORES; i++)
+    {
+      if (frecuencias[i] == 5)
+      {
+        generala = 1;
+      }
+    }
+
+    if (primerGenerala == 1 && generala == 1)
     {
       printf("11) Anotarse Generala Doble\n");
       arrAux[10] = 120;
